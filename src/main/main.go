@@ -17,8 +17,11 @@ import (
 func main() {
 	fmt.Println(os.Environ())
 	prefix, prefixErr := getPackageSpecificEnvironmentVariable("PREFIX", "#{")
+	fmt.Println(prefix)
 	suffix, suffixErr := getPackageSpecificEnvironmentVariable("SUFFIX", "}#")
+	fmt.Println(suffix)
 	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable("FAIL_ON_VARIABLE_NOT_FOUND")
+	fmt.Println(failOnVariableNotFound)
 	glob, globError := getPackageSpecificEnvironmentVariable("FILES", "**")
 	if prefixErr != nil {
 		panic(prefixErr)
@@ -46,7 +49,6 @@ func getFiles(globPattern string) []string {
 			println(err.Error())
 			return nil
 		}
-		log.Println(path)
 		match := glob.Match(path)
 		if match && !info.IsDir() {
 			files = append(files, path)
@@ -65,6 +67,7 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, failIfNotFound bool)
 	found := regex.FindAllString(contentAsString, -1)
 	var elementMap = make(map[string]string)
 	for _, f := range found {
+		fmt.Println(f)
 		elementMap[f] = f
 	}
 	for k := range elementMap {
