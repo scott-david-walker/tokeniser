@@ -24,6 +24,8 @@ jobs:
           fail-if-no-provided-replacement: false
         env:
           scott: ${{ env.x }}
+          tom: blah
+          xx: blahhhhhhhhhhhh
 
       - name: output
         run: |
