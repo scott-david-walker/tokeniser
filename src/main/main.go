@@ -118,7 +118,7 @@ func getPackageSpecificEnvironmentVariable(key string, defaultValue string) (str
 	return variable, nil
 }
 
-// ignore
+// ignores
 
 func getStringFromEnvironment(key string) (string, error) {
 	variable := os.Getenv(key)
