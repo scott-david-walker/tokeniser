@@ -20,7 +20,7 @@ func main() {
 	fmt.Println(prefix)
 	suffix, suffixErr := getPackageSpecificEnvironmentVariable("SUFFIX", "}#")
 	fmt.Println(suffix)
-	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable("FAIL_IF_NO_PROVIDED_REPLACEMENT")
+	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable("FAIL-IF-NO-PROVIDED-REPLACEMENT")
 	fmt.Println(failOnVariableNotFound)
 	glob, globError := getPackageSpecificEnvironmentVariable("FILES", "**")
 	if prefixErr != nil {
