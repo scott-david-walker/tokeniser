@@ -1,0 +1,17 @@
+name: test
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Needed for gitversion
+
+      - name: Replace Tokens
+        uses: scott-david-walker/scott-david-walker/tokeniser@0.0.1-alpha.2
