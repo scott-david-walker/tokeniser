@@ -123,7 +123,7 @@ func getPackageSpecificEnvironmentVariable(key string, defaultValue string) (str
 	return variable, nil
 }
 
-// ignores
+// ignoressdsdf
 
 func getStringFromEnvironment(key string) (string, error) {
 	variable := os.Getenv(key)
