@@ -17,8 +17,11 @@ import (
 func main() {
 	fmt.Println(os.Environ())
 	prefix, prefixErr := getPackageSpecificEnvironmentVariable("PREFIX", "#{")
+	fmt.Println(prefix)
 	suffix, suffixErr := getPackageSpecificEnvironmentVariable("SUFFIX", "}#")
+	fmt.Println(suffix)
 	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable("FAIL_ON_VARIABLE_NOT_FOUND")
+	fmt.Println(failOnVariableNotFound)
 	glob, globError := getPackageSpecificEnvironmentVariable("FILES", "**")
 	if prefixErr != nil {
 		panic(prefixErr)
@@ -31,10 +34,12 @@ func main() {
 		panic(globError)
 	}
 
+	prefixLen := len(prefix)
+	suffixLen := len(suffix)
 	regex := buildRegexString(prefix, suffix)
 	files := getFiles(glob)
 	for _, file := range files {
-		replaceValuesInFile(file, regex, failOnVariableNotFound)
+		replaceValuesInFile(file, regex, prefixLen, suffixLen, failOnVariableNotFound)
 	}
 }
 
@@ -46,7 +51,6 @@ func getFiles(globPattern string) []string {
 			println(err.Error())
 			return nil
 		}
-		log.Println(path)
 		match := glob.Match(path)
 		if match && !info.IsDir() {
 			files = append(files, path)
@@ -55,7 +59,7 @@ func getFiles(globPattern string) []string {
 	})
 	return files
 }
-func replaceValuesInFile(file string, regex *regexp.Regexp, failIfNotFound bool) {
+func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffixLen int, failIfNotFound bool) {
 	content, readErr := ioutil.ReadFile(file)
 	if readErr != nil {
 		log.Fatal(readErr.Error())
@@ -65,10 +69,11 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, failIfNotFound bool)
 	found := regex.FindAllString(contentAsString, -1)
 	var elementMap = make(map[string]string)
 	for _, f := range found {
+		fmt.Println(f)
 		elementMap[f] = f
 	}
 	for k := range elementMap {
-		val := k[2 : len(k)-2]
+		val := k[prefixLen : len(k)-suffixLen]
 		envVal, envErr := getStringFromEnvironment(val)
 		if envErr != nil && failIfNotFound {
 			panic(errors.New(fmt.Sprintf("Replacable string %s found in file %s but has no corresponding replacement", val, file)))
@@ -82,7 +87,7 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, failIfNotFound bool)
 }
 
 func buildRegexString(prefix string, suffix string) *regexp.Regexp {
-	regex := fmt.Sprintf("%s.*%s", prefix, suffix)
+	regex := fmt.Sprintf("^%s.*%s$", prefix, suffix)
 	reg, err := regexp.Compile(regex)
 	if err != nil {
 		panic(errors.New(err.Error()))
@@ -105,8 +110,8 @@ func getPackageSpecificBoolEnvironmentVariable(key string) bool {
 }
 
 func getPackageSpecificEnvironmentVariable(key string, defaultValue string) (string, error) {
-	variable := fmt.Sprintf("INPUT_%s", key)
-	variable = os.Getenv(key)
+	newKey := fmt.Sprintf("INPUT_%s", key)
+	variable := os.Getenv(newKey)
 	if variable == "" && defaultValue == "" {
 		return variable, errors.New(fmt.Sprint("key with name %s is required", key))
 	}
