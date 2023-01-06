@@ -26,5 +26,6 @@ jobs:
 
       - name: output2
         run: |
-          cat fake/test.yaml
+          cd fake
+          cat test.yaml
 
