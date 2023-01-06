@@ -27,5 +27,5 @@ jobs:
       - name: output2
         working-directory: fake
         run: |
-          cat test.yaml
+          ls
 
