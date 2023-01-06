@@ -34,10 +34,12 @@ func main() {
 		panic(globError)
 	}
 
+	prefixLen := len(prefix)
+	suffixLen := len(suffix)
 	regex := buildRegexString(prefix, suffix)
 	files := getFiles(glob)
 	for _, file := range files {
-		replaceValuesInFile(file, regex, failOnVariableNotFound)
+		replaceValuesInFile(file, regex, prefixLen, suffixLen, failOnVariableNotFound)
 	}
 }
 
@@ -57,7 +59,7 @@ func getFiles(globPattern string) []string {
 	})
 	return files
 }
-func replaceValuesInFile(file string, regex *regexp.Regexp, failIfNotFound bool) {
+func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffixLen int, failIfNotFound bool) {
 	content, readErr := ioutil.ReadFile(file)
 	if readErr != nil {
 		log.Fatal(readErr.Error())
@@ -71,7 +73,7 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, failIfNotFound bool)
 		elementMap[f] = f
 	}
 	for k := range elementMap {
-		val := k[2 : len(k)-2]
+		val := k[prefixLen : len(k)-suffixLen]
 		envVal, envErr := getStringFromEnvironment(val)
 		if envErr != nil && failIfNotFound {
 			panic(errors.New(fmt.Sprintf("Replacable string %s found in file %s but has no corresponding replacement", val, file)))
