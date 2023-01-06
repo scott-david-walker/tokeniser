@@ -15,14 +15,15 @@ import (
 )
 
 func main() {
-	fmt.Println(os.Environ())
-	prefix, prefixErr := getPackageSpecificEnvironmentVariable("PREFIX", "#{")
-	fmt.Println(prefix)
-	suffix, suffixErr := getPackageSpecificEnvironmentVariable("SUFFIX", "}#")
-	fmt.Println(suffix)
-	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable("FAIL-IF-NO-PROVIDED-REPLACEMENT")
-	fmt.Println(failOnVariableNotFound)
-	glob, globError := getPackageSpecificEnvironmentVariable("FILES", "**")
+	const prefixKey = "PREFIX"
+	const suffixKey = "SUFFIX"
+	const filesKey = "FILES"
+	const failOnNotFoundKey = "FAIL-IF-NO-PROVIDED-REPLACEMENT"
+	prefix, prefixErr := getPackageSpecificEnvironmentVariable(prefixKey, "#{")
+	suffix, suffixErr := getPackageSpecificEnvironmentVariable(suffixKey, "}#")
+	globPattern, globError := getPackageSpecificEnvironmentVariable(filesKey, "**")
+	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable(failOnNotFoundKey)
+
 	if prefixErr != nil {
 		panic(prefixErr)
 	}
@@ -37,21 +38,21 @@ func main() {
 	prefixLen := len(prefix)
 	suffixLen := len(suffix)
 	regex := buildRegexString(prefix, suffix)
-	files := getFiles(glob)
+	files := getFiles(globPattern)
 	for _, file := range files {
 		replaceValuesInFile(file, regex, prefixLen, suffixLen, failOnVariableNotFound)
 	}
 }
 
 func getFiles(globPattern string) []string {
-	glob := glob.MustCompile(globPattern)
+	compiledGlob := glob.MustCompile(globPattern)
 	var files []string
 	filepath.Walk(".", func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			println(err.Error())
+			log.Fatal(err.Error())
 			return nil
 		}
-		match := glob.Match(path)
+		match := compiledGlob.Match(path)
 		if match && !info.IsDir() {
 			files = append(files, path)
 		}
@@ -68,17 +69,17 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffi
 	contentAsString := string(content[:])
 	found := regex.FindAllString(contentAsString, -1)
 	var elementMap = make(map[string]string)
-	for _, f := range found {
-		fmt.Println(f)
-		elementMap[f] = f
+	for _, foundFile := range found {
+		elementMap[foundFile] = foundFile
 	}
-	for k := range elementMap {
-		val := k[prefixLen : len(k)-suffixLen]
+	for key := range elementMap {
+		val := key[prefixLen : len(key)-suffixLen]
 		envVal, envErr := getStringFromEnvironment(val)
 		if envErr != nil && failIfNotFound {
-			panic(errors.New(fmt.Sprintf("Replacable string %s found in file %s but has no corresponding replacement", val, file)))
+			panic(errors.New(fmt.Sprintf("Replacable string '%s' found in file '%s' but has no corresponding replacement", val, file)))
 		}
-		contentAsString = strings.ReplaceAll(contentAsString, k, envVal)
+		log.Println(fmt.Sprintf("Replacing value '%s' with '%s'", key, envVal))
+		contentAsString = strings.ReplaceAll(contentAsString, key, envVal)
 	}
 	writeErr := ioutil.WriteFile(file, []byte(contentAsString), 0)
 	if writeErr != nil {
