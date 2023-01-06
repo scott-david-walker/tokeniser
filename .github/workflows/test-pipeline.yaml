@@ -19,6 +19,7 @@ jobs:
         uses: scott-david-walker/tokeniser@0.0.1-alpha.8
         with:
           prefix: "{{{"
+          suffix: "}}}}}"
           files: "**/*.yaml"
           fail-if-no-provided-replacement: false
         env:
