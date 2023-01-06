@@ -1,0 +1,16 @@
+name: "tokeniser"
+description: "Finds and replaces strings"
+author: "Scott Walker"
+inputs:
+  files:
+    description: "A glob of files search through"
+    default: "**"
+    required: false
+  prefix:
+    description: "The values that prefix the string"
+    default: "#{"
+    required: false
+  suffix:
+    description: "The values that suffix the string"
+    default: "}#"
+    required: false
