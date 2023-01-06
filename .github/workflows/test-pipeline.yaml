@@ -16,7 +16,7 @@ jobs:
       - name: Replace Tokens
         uses: scott-david-walker/tokeniser@0.0.1-alpha.2
         with:
-          failOnVariableNotFound: false
+          fail-on-variable-not-found: false
 
       - name: output
         run: |
