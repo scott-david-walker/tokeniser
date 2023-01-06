@@ -16,7 +16,7 @@ jobs:
       - name: Replace Tokens
         uses: scott-david-walker/tokeniser@0.0.1-alpha.2
         with:
-          fail-on-variable-not-found: false
+          prefix: "{{{"
 
       - name: output
         run: |

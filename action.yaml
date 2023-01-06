@@ -14,6 +14,7 @@ inputs:
     description: "The values that suffix the string"
     default: "}#"
     required: false
+
 runs:
   using: "docker"
   image: "docker://ghcr.io/scott-david-walker/tokeniser:0.0.2"
