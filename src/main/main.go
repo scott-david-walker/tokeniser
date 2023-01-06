@@ -105,8 +105,8 @@ func getPackageSpecificBoolEnvironmentVariable(key string) bool {
 }
 
 func getPackageSpecificEnvironmentVariable(key string, defaultValue string) (string, error) {
-	variable := fmt.Sprintf("INPUT_%s", key)
-	variable = os.Getenv(key)
+	newKey := fmt.Sprintf("INPUT_%s", key)
+	variable := os.Getenv(newKey)
 	if variable == "" && defaultValue == "" {
 		return variable, errors.New(fmt.Sprint("key with name %s is required", key))
 	}
