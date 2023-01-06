@@ -25,7 +25,7 @@ jobs:
           cat test.txt
 
       - name: output2
+        working-directory: fake
         run: |
-          cd fake
           cat test.yaml
 
