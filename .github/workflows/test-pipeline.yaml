@@ -19,6 +19,8 @@ jobs:
           prefix: "{{{"
           files: "**/*.yaml"
           fail-if-no-provided-replacement: false
+        env:
+          scott: iuyasdgf
 
       - name: output
         run: |
@@ -27,5 +29,5 @@ jobs:
       - name: output2
         working-directory: fake
         run: |
-          ls
+          cat test.yaml
 
