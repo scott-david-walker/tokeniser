@@ -17,6 +17,8 @@ jobs:
         uses: scott-david-walker/tokeniser@0.0.1-alpha.2
         with:
           prefix: "{{{"
+        env:
+          scott: hjahahaha
 
       - name: output
         run: |
