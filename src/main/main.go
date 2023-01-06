@@ -88,7 +88,7 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffi
 }
 
 func buildRegexString(prefix string, suffix string) *regexp.Regexp {
-	regex := fmt.Sprintf("^%s.*%s$", prefix, suffix)
+	regex := fmt.Sprintf("%s.*%s", prefix, suffix)
 	reg, err := regexp.Compile(regex)
 	if err != nil {
 		panic(errors.New(err.Error()))

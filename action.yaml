@@ -21,4 +21,4 @@ inputs:
     required: false
 runs:
   using: "docker"
-  image: "docker://ghcr.io/scott-david-walker/tokeniser:1.0.0"
+  image: "docker://ghcr.io/scott-david-walker/tokeniser:1.0.1"
