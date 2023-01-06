@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	fmt.Println(os.Environ())
 	prefix, prefixErr := getPackageSpecificEnvironmentVariable("PREFIX", "#{")
 	suffix, suffixErr := getPackageSpecificEnvironmentVariable("SUFFIX", "}#")
 	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable("FAIL_ON_VARIABLE_NOT_FOUND")
