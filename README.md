@@ -18,7 +18,7 @@ If you wanted to replace `#{version}#` in all of your yaml files
   with:
     files: '**/*.yaml'
   env:
-    version: "1.0.0"    
+    version: "1.0.3"  
 ```
 
 If you want to use a different format, you can use a different prefix and suffix.
@@ -31,5 +31,5 @@ Same example as before, but this time with `{{ }}`
     suffix: '}}'
     files: '**/*.yaml'
   env:
-    version: "1.0.0"   
+    version: "1.0.3"
 ```
