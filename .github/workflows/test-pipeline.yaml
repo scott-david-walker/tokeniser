@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0 # Needed for gitversion
 
       - name: Replace Tokens
-        uses: scott-david-walker/tokeniser@v1.0.1
+        uses: scott-david-walker/tokeniser@v1.0.3
         with:
           prefix: "{{{"
           suffix: "}}}}}"
