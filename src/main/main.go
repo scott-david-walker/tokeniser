@@ -78,7 +78,7 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffi
 		if envErr != nil && failIfNotFound {
 			panic(errors.New(fmt.Sprintf("Replacable string '%s' found in file '%s' but has no corresponding replacement", val, file)))
 		}
-		log.Println(fmt.Sprintf("Replacing value '%s' with '%s'", key, envVal))
+		log.Println(fmt.Sprintf("Replacing value '%s' with '%s' in file '%s'", key, envVal, file))
 		contentAsString = strings.ReplaceAll(contentAsString, key, envVal)
 	}
 	writeErr := ioutil.WriteFile(file, []byte(contentAsString), 0)
