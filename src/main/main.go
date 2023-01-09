@@ -14,7 +14,23 @@ import (
 	"strings"
 )
 
+type configuration struct {
+	prefix                 string
+	suffix                 string
+	globPattern            string
+	failOnVariableNotFound bool
+}
+
 func main() {
+	configuration := getConfiguration()
+	regex := buildRegexString(configuration.prefix, configuration.suffix)
+	files := getFiles(configuration.globPattern)
+	for _, file := range files {
+		replaceValuesInFile(file, regex, configuration)
+	}
+}
+
+func getConfiguration() configuration {
 	const prefixKey = "PREFIX"
 	const suffixKey = "SUFFIX"
 	const filesKey = "FILES"
@@ -35,12 +51,11 @@ func main() {
 		panic(globError)
 	}
 
-	prefixLen := len(prefix)
-	suffixLen := len(suffix)
-	regex := buildRegexString(prefix, suffix)
-	files := getFiles(globPattern)
-	for _, file := range files {
-		replaceValuesInFile(file, regex, prefixLen, suffixLen, failOnVariableNotFound)
+	return configuration{
+		prefix:                 prefix,
+		suffix:                 suffix,
+		globPattern:            globPattern,
+		failOnVariableNotFound: failOnVariableNotFound,
 	}
 }
 
@@ -60,22 +75,25 @@ func getFiles(globPattern string) []string {
 	})
 	return files
 }
-func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffixLen int, failIfNotFound bool) {
+
+func replaceValuesInFile(file string, regex *regexp.Regexp, config configuration) {
 	content, readErr := ioutil.ReadFile(file)
 	if readErr != nil {
-		log.Fatal(readErr.Error())
-		return
+		panic(readErr)
 	}
 	contentAsString := string(content[:])
 	found := regex.FindAllString(contentAsString, -1)
+	if len(found) == 0 {
+		return
+	}
 	var elementMap = make(map[string]string)
 	for _, foundItem := range found {
 		elementMap[foundItem] = foundItem
 	}
 	for key := range elementMap {
-		val := key[prefixLen : len(key)-suffixLen]
+		val := key[len(config.prefix) : len(key)-len(config.suffix)]
 		envVal, envErr := getStringFromEnvironment(val)
-		if envErr != nil && failIfNotFound {
+		if envErr != nil && config.failOnVariableNotFound {
 			panic(errors.New(fmt.Sprintf("Replacable string '%s' found in file '%s' but has no corresponding replacement", val, file)))
 		}
 		log.Println(fmt.Sprintf("Replacing value '%s' with '%s' in file '%s'", key, envVal, file))

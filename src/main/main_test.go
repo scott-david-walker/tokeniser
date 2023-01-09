@@ -100,3 +100,25 @@ func TestRegexForFindingSearchString_WhenMultipleMatchesOnSameLine_ShouldMatch(t
 		t.Fatalf("Expected 2 matches but found %d", numOfFound)
 	}
 }
+
+func TestGetConfiguration_ShouldPopulateObjectWithVariables(t *testing.T) {
+	input := []string{"INPUT_PREFIX", "INPUT_SUFFIX", "INPUT_FILES"}
+
+	for _, key := range input {
+		os.Setenv(key, "test_"+key)
+	}
+
+	configuration := getConfiguration()
+
+	if configuration.prefix != "test_INPUT_PREFIX" {
+		t.Fatalf("Expected test_INPUT_PREFIX but received %s", configuration.prefix)
+	}
+
+	if configuration.suffix != "test_INPUT_SUFFIX" {
+		t.Fatalf("Expected test_INPUT_SUFFIX but received %s", configuration.suffix)
+	}
+
+	if configuration.globPattern != "test_INPUT_FILES" {
+		t.Fatalf("Expected test_INPUT_FILES but received %s", configuration.globPattern)
+	}
+}
