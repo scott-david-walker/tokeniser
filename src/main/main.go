@@ -69,8 +69,8 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffi
 	contentAsString := string(content[:])
 	found := regex.FindAllString(contentAsString, -1)
 	var elementMap = make(map[string]string)
-	for _, foundFile := range found {
-		elementMap[foundFile] = foundFile
+	for _, foundItem := range found {
+		elementMap[foundItem] = foundItem
 	}
 	for key := range elementMap {
 		val := key[prefixLen : len(key)-suffixLen]
@@ -114,7 +114,7 @@ func getPackageSpecificEnvironmentVariable(key string, defaultValue string) (str
 	newKey := fmt.Sprintf("INPUT_%s", key)
 	variable := os.Getenv(newKey)
 	if variable == "" && defaultValue == "" {
-		return variable, errors.New(fmt.Sprint("key with name %s is required", key))
+		return variable, errors.New(fmt.Sprintf("key with name %s is required", key))
 	}
 
 	if variable == "" {
