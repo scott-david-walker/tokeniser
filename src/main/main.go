@@ -19,9 +19,9 @@ func main() {
 	const suffixKey = "SUFFIX"
 	const filesKey = "FILES"
 	const failOnNotFoundKey = "FAIL-IF-NO-PROVIDED-REPLACEMENT"
-	prefix, prefixErr := GetPackageSpecificEnvironmentVariable(prefixKey, "#{")
-	suffix, suffixErr := GetPackageSpecificEnvironmentVariable(suffixKey, "}#")
-	globPattern, globError := GetPackageSpecificEnvironmentVariable(filesKey, "**")
+	prefix, prefixErr := getPackageSpecificEnvironmentVariable(prefixKey, "#{")
+	suffix, suffixErr := getPackageSpecificEnvironmentVariable(suffixKey, "}#")
+	globPattern, globError := getPackageSpecificEnvironmentVariable(filesKey, "**")
 	failOnVariableNotFound := getPackageSpecificBoolEnvironmentVariable(failOnNotFoundKey)
 
 	if prefixErr != nil {
@@ -97,7 +97,7 @@ func buildRegexString(prefix string, suffix string) *regexp.Regexp {
 }
 
 func getPackageSpecificBoolEnvironmentVariable(key string) bool {
-	v, err := GetPackageSpecificEnvironmentVariable(key, "")
+	v, err := getPackageSpecificEnvironmentVariable(key, "")
 
 	if err != nil {
 		return true
@@ -110,7 +110,7 @@ func getPackageSpecificBoolEnvironmentVariable(key string) bool {
 	return bv
 }
 
-func GetPackageSpecificEnvironmentVariable(key string, defaultValue string) (string, error) {
+func getPackageSpecificEnvironmentVariable(key string, defaultValue string) (string, error) {
 	newKey := fmt.Sprintf("INPUT_%s", key)
 	variable := os.Getenv(newKey)
 	if variable == "" && defaultValue == "" {
