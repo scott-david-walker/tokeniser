@@ -23,9 +23,9 @@ jobs:
         run: |
           go get .
 
-      - name: Build
-        working-directory: "src/main"
-        run: go build -v
+#      - name: Build
+#        working-directory: "src/main"
+#        run: go build -v
 
       - name: Test
         working-directory: "src/main"
