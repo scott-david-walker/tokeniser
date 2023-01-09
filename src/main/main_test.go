@@ -47,6 +47,7 @@ func TestGetPackageBoolVariable_WhenNotEmpty_ShouldReturnValue(t *testing.T) {
 }
 
 func TestGetPackageBoolVariable_WhenEmpty_ShouldReturnTrue(t *testing.T) {
+	os.Setenv("INPUT_KEY", "")
 	result := getPackageSpecificBoolEnvironmentVariable("KEY")
 	if result != true {
 		t.Fatalf("Should have true got %t", result)
