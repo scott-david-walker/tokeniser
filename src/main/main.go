@@ -69,8 +69,8 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, prefixLen int, suffi
 	contentAsString := string(content[:])
 	found := regex.FindAllString(contentAsString, -1)
 	var elementMap = make(map[string]string)
-	for _, foundFile := range found {
-		elementMap[foundFile] = foundFile
+	for _, foundItem := range found {
+		elementMap[foundItem] = foundItem
 	}
 	for key := range elementMap {
 		val := key[prefixLen : len(key)-suffixLen]
