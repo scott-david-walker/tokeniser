@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+type ReadFile func(filename string) ([]byte, error)
+type WriteFile func(filename string, data []byte, perm fs.FileMode) error
 type configuration struct {
 	prefix                 string
 	suffix                 string
@@ -26,7 +28,7 @@ func main() {
 	regex := buildRegexString(configuration.prefix, configuration.suffix)
 	files := getFiles(configuration.globPattern)
 	for _, file := range files {
-		replaceValuesInFile(file, regex, configuration)
+		replaceValuesInFile(file, regex, configuration, ioutil.ReadFile, ioutil.WriteFile)
 	}
 }
 
@@ -76,8 +78,8 @@ func getFiles(globPattern string) []string {
 	return files
 }
 
-func replaceValuesInFile(file string, regex *regexp.Regexp, config configuration) {
-	content, readErr := ioutil.ReadFile(file)
+func replaceValuesInFile(file string, regex *regexp.Regexp, config configuration, read ReadFile, write WriteFile) {
+	content, readErr := read(file)
 	if readErr != nil {
 		panic(readErr)
 	}
@@ -99,7 +101,7 @@ func replaceValuesInFile(file string, regex *regexp.Regexp, config configuration
 		log.Println(fmt.Sprintf("Replacing value '%s' with '%s' in file '%s'", key, envVal, file))
 		contentAsString = strings.ReplaceAll(contentAsString, key, envVal)
 	}
-	writeErr := ioutil.WriteFile(file, []byte(contentAsString), 0)
+	writeErr := write(file, []byte(contentAsString), 0)
 	if writeErr != nil {
 		panic(writeErr)
 	}
