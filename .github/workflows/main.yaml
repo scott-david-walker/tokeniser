@@ -30,7 +30,7 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=raw,value=1.0.4
+          type=raw,value=1.0.5
 
     - name: Test container
       uses: docker/build-push-action@v3

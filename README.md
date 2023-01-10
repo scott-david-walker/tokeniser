@@ -14,22 +14,22 @@ Simple GitHub Action written in go to replace strings in files
 If you wanted to replace `#{version}#` in all of your yaml files
 
 ```yml
-- uses: scott-david-walker/tokeniser@v1.0.3
+- uses: scott-david-walker/tokeniser@v1.0.5
   with:
     files: '**/*.yaml'
   env:
-    version: "1.0.3"  
+    version: "1.0.5"  
 ```
 
 If you want to use a different format, you can use a different prefix and suffix.
 Same example as before, but this time with `{{ }}`
 
 ```yml
-- uses: scott-david-walker/tokeniser@v1.0.3
+- uses: scott-david-walker/tokeniser@v1.0.5
   with:
     prefix: '{{'
     suffix: '}}'
     files: '**/*.yaml'
   env:
-    version: "1.0.3"
+    version: "1.0.5"
 ```
