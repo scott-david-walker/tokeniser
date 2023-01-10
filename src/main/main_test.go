@@ -1,7 +1,10 @@
 package main
 
 import (
+	"errors"
+	"io/fs"
 	"os"
+	"regexp"
 	"testing"
 )
 
@@ -55,12 +58,7 @@ func TestGetPackageBoolVariable_WhenEmpty_ShouldReturnTrue(t *testing.T) {
 }
 
 func TestGetPackageBoolVariable_WhenValueIsNotParseableAsBool_ShouldPanic(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
+	defer genericPanic(t)
 	os.Setenv("INPUT_KEY", "panic")
 	_ = getPackageSpecificBoolEnvironmentVariable("KEY")
 }
@@ -98,5 +96,79 @@ func TestRegexForFindingSearchString_WhenMultipleMatchesOnSameLine_ShouldMatch(t
 
 	if numOfFound != 2 {
 		t.Fatalf("Expected 2 matches but found %d", numOfFound)
+	}
+}
+
+func TestGetConfiguration_ShouldPopulateObjectWithVariables(t *testing.T) {
+	input := []string{"INPUT_PREFIX", "INPUT_SUFFIX", "INPUT_FILES"}
+
+	for _, key := range input {
+		os.Setenv(key, "test_"+key)
+	}
+
+	configuration := getConfiguration()
+
+	if configuration.prefix != "test_INPUT_PREFIX" {
+		t.Fatalf("Expected test_INPUT_PREFIX but received %s", configuration.prefix)
+	}
+
+	if configuration.suffix != "test_INPUT_SUFFIX" {
+		t.Fatalf("Expected test_INPUT_SUFFIX but received %s", configuration.suffix)
+	}
+
+	if configuration.globPattern != "test_INPUT_FILES" {
+		t.Fatalf("Expected test_INPUT_FILES but received %s", configuration.globPattern)
+	}
+}
+
+func TestShouldPanicIfReadError(t *testing.T) {
+	defer genericPanic(t)
+	reg, err := regexp.Compile("#{.*?}#")
+	if err != nil {
+		panic("Regex should've compiled")
+	}
+	replaceValuesInFile("file", reg, configuration{}, mockRead("", true), nil)
+}
+
+func TestReplaceValues_WhenSomethingCanBeReplaced_ButHasNoEnvVariable_ShouldPanic(t *testing.T) {
+	defer genericPanic(t)
+	reg, err := regexp.Compile("#{.*?}#")
+	if err != nil {
+		panic("Regex should've compiled")
+	}
+	replaceValuesInFile("file", reg, configuration{}, mockRead("#{blah}#", false), nil)
+}
+
+func TestReplaceValues_WhenSomethingCanBeReplaced_ShouldReplace(t *testing.T) {
+	os.Setenv("blah", "value")
+	reg, err := regexp.Compile("#{.*?}#")
+	if err != nil {
+		panic("Regex should've compiled")
+	}
+
+	writeFile := func(filename string, data []byte, perm fs.FileMode) error {
+		content := string(data[:])
+		if content != "value" {
+			t.Fatalf("Expected %s but received %s", "value", content)
+		}
+		return nil
+	}
+	replaceValuesInFile("file", reg, configuration{prefix: "#{", suffix: "}#"}, mockRead("#{blah}#", false), writeFile)
+}
+
+func mockRead(content string, shouldPanic bool) func(filename string) ([]byte, error) {
+	return func(filename string) ([]byte, error) {
+		var err error = nil
+		bytes := []byte(content)
+		if shouldPanic {
+			err = errors.New("error")
+		}
+		return bytes, err
+	}
+}
+
+func genericPanic(t *testing.T) {
+	if r := recover(); r == nil {
+		t.Errorf("The code did not panic")
 	}
 }
